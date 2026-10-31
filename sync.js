@@ -55,7 +55,7 @@
     var signup = mode === 'signup';
     o.innerHTML = '<div style="position:fixed;inset:0;z-index:80;background:#F5DDE1;display:flex;align-items:center;justify-content:center;padding:32px">' +
       '<form id="authf" style="width:100%;max-width:380px;text-align:center;display:flex;flex-direction:column;gap:14px">' +
-      '<span class="label">Lulu</span><h1 class="big serif">' + (signup ? 'Make your account.' : 'Welcome back.') + '</h1>' +
+      '<span class="label">Flourish</span><h1 class="big serif">' + (signup ? 'Make your account.' : 'Welcome back.') + '</h1>' +
       '<p style="margin:0 0 6px;font-size:15px;line-height:1.5">' + (msg || (signup ? 'Your plan saves to your account, so it follows you to every device.' : 'Sign in to pick up where you left off.')) + '</p>' +
       '<label class="field" style="text-align:left">Email<input id="ae" type="email" autocomplete="email" required></label>' +
       '<label class="field" style="text-align:left">Password<input id="ap" type="password" autocomplete="' + (signup ? 'new-password' : 'current-password') + '" minlength="8" required></label>' +

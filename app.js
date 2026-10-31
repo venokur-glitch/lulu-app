@@ -495,10 +495,10 @@
   }
   function exportData() {
     var blob = new Blob([JSON.stringify(state, null, 1)], { type: 'application/json' });
-    var name = 'lulu-backup-' + todayStr() + '.json';
+    var name = 'flourish-backup-' + todayStr() + '.json';
     var file;
     try { file = new File([blob], name, { type: 'application/json' }); } catch (e) {}
-    if (file && navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: 'Lulu backup' }).catch(function () {}); return; }
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: 'Flourish backup' }).catch(function () {}); return; }
     var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
   }
   function importData(e) {
