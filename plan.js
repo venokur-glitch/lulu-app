@@ -1,14 +1,14 @@
-// Season 1: Lulu's 60-day focus plan, Oct 29 to Dec 27, 2026.
+// Season 1: Lulu's 60-day focus plan, Nov 2 to Dec 31, 2026. Day 1 is Monday, Nov 2.
 // The New Season flow replaces this every 60 days.
 window.SEASON = {
   id: 'season-1',
-  start: '2026-10-29',
-  end: '2026-12-27',
+  start: '2026-11-02',
+  end: '2026-12-31',
   reward: 'Frye boots',
   goals: [
     { id: 'yf', name: 'Yesterday Forgotten', due: '2026-11-12', detail: 'Pattern collection for P&B Textiles. 6 must-have patterns, 6 bonus.' },
-    { id: 'web', name: 'Website', plants: '2026-11-12', detail: 'Brand, portfolio, third collection, Instagram and links.' },
-    { id: 'model', name: 'Modeling', plants: '2026-12-03', detail: 'NEXT Miami, AMAX and Blair Models applications.' }
+    { id: 'web', name: 'Website', plants: '2026-11-16', detail: 'Brand, portfolio, third collection, Instagram and links.' },
+    { id: 'model', name: 'Modeling', plants: '2026-12-07', detail: 'NEXT Miami, AMAX and Blair Models applications.' }
   ],
   weeks: [
     { n: 1, phase: 'Finish Yesterday Forgotten', goal: 'yf', theme: 'Turn inspiration into a clear plan',

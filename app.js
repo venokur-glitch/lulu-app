@@ -61,6 +61,12 @@
   function weekStart(i) { return addDays(S.start, i * 7); }
   function weekEnd(i) { return i === S.weeks.length - 1 ? S.end : addDays(S.start, i * 7 + 6); }
   function dayN(d) { return Math.max(1, Math.min(60, daysBetween(S.start, d) + 1)); }
+  function dayLabel(d) {
+    var until = daysBetween(d, S.start);
+    if (until === 1) return 'Day 1 is tomorrow';
+    if (until > 1) return 'Day 1 is ' + nice(S.start);
+    return 'Day ' + dayN(d) + ' of 60';
+  }
   function bloomCount() { var n = 0; for (var i = 0; i < 6; i++) if (state.patterns[i].status === 'bloom') n++; return n; }
   function goalProgress(g) {
     var tot = 0, done = 0;
@@ -188,7 +194,7 @@
       '<section class="card" style="background:' + c.bg + '" id="card">' +
       '<div class="top"><span class="label">' + esc(c.label) + '</span><div class="dots" aria-label="Card ' + (cardIdx + 1) + ' of 3">' +
       cards.map(function (_, i) { return '<span class="' + (i === cardIdx ? 'on' : '') + '"></span>'; }).join('') + '</div></div>' +
-      '<div class="mid"><span class="label" style="letter-spacing:1.2px">' + DOW[d.getDay()] + ' · ' + MON[d.getMonth()] + ' ' + d.getDate() + ' · Day ' + dayN(t) + ' of 60</span>' +
+      '<div class="mid"><span class="label" style="letter-spacing:1.2px">' + DOW[d.getDay()] + ' · ' + MON[d.getMonth()] + ' ' + d.getDate() + ' · ' + dayLabel(t) + '</span>' +
       '<h1 class="big serif">' + esc(c.h) + '</h1><p>' + esc(c.p) + '</p>' +
       '<a class="pill" href="' + c.href + '" style="margin-top:12px">' + c.btn + '</a></div>' +
       '<div class="nav"><button class="round" aria-label="Previous card" data-act="prev">' + arrow('M15 5l-7 7 7 7') + '</button>' +
@@ -365,14 +371,14 @@
     }).join('');
     var celebrate = b === 6 ? '<div class="note" style="text-align:center;margin-top:14px"><span class="serif" style="font-size:24px">All six in bloom.</span><br>' + S.rewards[0].what + '</div>' : '';
     app.innerHTML = '<div class="screen" style="background:var(--oat);min-height:100vh;text-align:center">' +
-      '<span class="label">Season one · Day ' + dayN(t) + ' of 60</span><h1 class="big serif" style="margin-top:8px">Your Garden</h1>' +
+      '<span class="label">Season one · ' + dayLabel(t) + '</span><h1 class="big serif" style="margin-top:8px">Your Garden</h1>' +
       '<div class="path" style="margin-top:24px">' + path + '</div>' +
-      '<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px" class="muted"><span>Oct 29</span><span>' + esc(S.reward) + ' · Dec 27</span></div>' +
+      '<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px" class="muted"><span>' + short(S.start) + '</span><span>' + esc(S.reward) + ' · ' + short(S.end) + '</span></div>' +
       '<button class="linerow" data-week="' + wi + '" style="border:0;justify-content:center;gap:6px;font-size:14px"><span class="label">Week ' + (wi + 1) + '</span><span>' + esc(S.weeks[wi].theme) + ' →</span></button>' +
       '<div class="bed" style="margin-top:6px"><span class="label">Yesterday Forgotten · Nov 12</span><div class="plants">' + plants + '</div>' +
       '<span class="serif" style="font-size:22px">' + b + ' of 6 in bloom</span><div class="bonus" aria-label="Bonus patterns">' + bonus + '</div><span class="muted" style="font-size:12px">Tap a plant to name it or grow it</span></div>' + celebrate +
       '<div style="margin-top:12px;text-align:left">' +
-      bedRow('Website', web, 'plants Nov 12', 2) + bedRow('Modeling', mod, 'plants Dec 3', 5) + '</div>' +
+      bedRow('Website', web, 'plants ' + short(weekStart(2)), 2) + bedRow('Modeling', mod, 'plants ' + short(weekStart(5)), 5) + '</div>' +
       '<a class="pill solid block" href="#day" style="margin-top:22px">Next: ' + esc(lowerFirst(headlineFor(t)).replace(/\.$/, '')) + '</a></div>';
     app.querySelectorAll('[data-pat]').forEach(function (bt) { bt.addEventListener('click', function () { patternSheet(+bt.getAttribute('data-pat')); }); });
     app.querySelectorAll('[data-week]').forEach(function (bt) { bt.addEventListener('click', function () { weekSheet(+bt.getAttribute('data-week')); }); });
