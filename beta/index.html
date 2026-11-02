@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Flourish">
+<meta name="theme-color" content="#F5DDE1">
+<title>Flourish</title>
+
+<link rel="apple-touch-icon" href="../icon-180.png">
+<link rel="icon" href="../icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --oat:#EBE5D7; --peony:#F5DDE1; --sea:#D3DFEB; --chamomile:#DCDBAE; --chestnut:#70604F; --storm:#808DA0;
+  --ink:#1F1B17; --black:#111111; --paper:#FBF9F4; --rule:#E4DED2; --muted:#70604F;
+  --tabh:64px; --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;font-size:16px}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+.serif{font-family:'Instrument Serif',Georgia,serif;font-weight:400}
+.label{font-size:11px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase}
+.muted{color:var(--muted)}
+#app{min-height:100%;padding-bottom:calc(var(--tabh) + var(--safe-b))}
+.screen{min-height:calc(100vh - var(--tabh) - var(--safe-b));padding:calc(var(--safe-t) + 40px) 24px 32px;max-width:560px;margin:0 auto}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;height:calc(var(--tabh) + var(--safe-b));padding-bottom:var(--safe-b);background:var(--black);display:flex;justify-content:space-around;align-items:center;z-index:20}
+nav.tabs a{color:#fff;text-decoration:none;font-size:14px;padding:12px 6px;min-width:52px;text-align:center}
+nav.tabs a.on{text-decoration:underline;text-underline-offset:6px}
+h1.big{margin:0;font-size:44px;line-height:1.05}
+.pill{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 28px;border:1.5px solid var(--ink);border-radius:999px;background:transparent;font-size:16px;text-decoration:none;color:var(--ink)}
+.pill.solid{background:var(--black);border-color:var(--black);color:#fff}
+.pill.small{min-height:40px;padding:0 18px;font-size:14px}
+.pill.block{display:flex;width:100%}
+.round{width:48px;height:48px;border-radius:999px;border:0;background:var(--black);display:flex;align-items:center;justify-content:center}
+/* Today cards */
+.card{position:fixed;inset:0 0 calc(var(--tabh) + var(--safe-b)) 0;display:flex;flex-direction:column;align-items:center;text-align:center;padding:calc(var(--safe-t) + 48px) 32px 28px;transition:background .35s}
+.card .top{display:flex;flex-direction:column;align-items:center;gap:10px}
+.dots{display:flex;gap:6px}.dots span{width:6px;height:6px;border-radius:9px;background:rgba(31,27,23,.25)}.dots span.on{background:var(--ink)}
+.card .mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;max-width:420px}
+.card p{margin:0;font-size:16px;line-height:1.55}
+.card .nav{display:flex;justify-content:space-between;width:100%;max-width:480px}
+/* lists */
+.row{display:flex;align-items:center;gap:14px;min-height:54px;padding:8px 0;border:0;border-bottom:1px solid var(--rule);background:transparent;width:100%;text-align:left}
+.check{flex:0 0 24px;width:24px;height:24px;border-radius:99px;border:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center}
+.check.on{background:var(--ink)}
+.done-text{text-decoration:line-through;color:var(--muted)}
+.tag{font-size:11px;color:var(--muted);margin-left:6px}
+.section{margin-top:28px}
+.section > .label{display:block;margin-bottom:8px}
+.add{display:flex;gap:8px;margin-top:10px}
+.add input{flex:1;min-height:46px;border:1px solid var(--rule);border-radius:14px;padding:0 14px;background:#fff}
+.edit{width:100%;border:0;border-bottom:1px dashed #CFC7B6;background:transparent;padding:6px 0;resize:none}
+.tl{display:grid;grid-template-columns:12px 72px 1fr;gap:12px 10px;align-items:center;font-size:15px}
+.tl .dot{width:10px;height:10px;border-radius:9px}
+.tl button{border:0;background:none;padding:0;text-align:left;min-height:28px}
+.italic{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:19px;color:var(--muted)}
+.note{background:#fff;border-radius:18px;padding:14px 16px;font-size:14px;line-height:1.5}
+.warn{background:var(--chamomile);border-radius:18px;padding:14px 16px;font-size:14px;line-height:1.5}
+/* garden */
+.path{display:flex;align-items:center;width:100%}
+.path button{flex:0 0 auto;border:0;padding:0;background:transparent;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
+.path button span{display:block;border-radius:99px}
+.path i{flex:1 1 auto;height:1px;background:#B5AC9A}
+.bed{background:var(--peony);border-radius:28px;padding:20px 14px 16px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.plants{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:100%;align-items:end;border-bottom:2px solid var(--chestnut);padding-bottom:2px}
+.plants button{border:0;background:transparent;padding:0;display:flex;justify-content:center;min-height:64px}
+.bonus{display:flex;gap:10px;justify-content:center}
+.bonus button{border:0;background:transparent;padding:4px}
+.linerow{display:flex;justify-content:space-between;align-items:center;padding:14px 4px;border:0;border-bottom:1px solid #CFC7B6;width:100%;background:transparent;text-align:left;font-size:15px;min-height:52px}
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(17,17,17,.35);z-index:40;display:flex;align-items:flex-end}
+.sheet{background:var(--paper);width:100%;max-width:600px;margin:0 auto;border-radius:28px 28px 0 0;max-height:88vh;overflow:auto;padding:22px 24px calc(28px + var(--safe-b))}
+.sheet .grab{width:40px;height:4px;border-radius:9px;background:#CFC7B6;margin:0 auto 14px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{min-height:40px;padding:0 14px;border-radius:99px;border:1.5px solid var(--ink);background:transparent;font-size:14px}
+.seg button.on{background:var(--ink);color:#fff}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.field input,.field select{min-height:46px;border:1px solid var(--rule);border-radius:14px;padding:0 12px;background:#fff;color:var(--ink);font-size:16px}
+.grid3{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px}
+.toast{pointer-events:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabh) + var(--safe-b) + 18px);background:var(--black);color:#fff;padding:12px 18px;border-radius:99px;font-size:14px;z-index:60}
+.petals{position:fixed;inset:0;pointer-events:none;z-index:70;overflow:hidden}
+.petals svg{position:absolute;top:-30px;animation-name:fall,sway;animation-timing-function:linear,ease-in-out;animation-iteration-count:1,infinite;animation-fill-mode:forwards}
+@keyframes fall{0%{transform:translateY(0) rotate(0);opacity:0}8%{opacity:1}100%{transform:translateY(110vh) rotate(320deg);opacity:.9}}
+@keyframes sway{0%,100%{margin-left:0}50%{margin-left:22px}}
+@media (prefers-reduced-motion: reduce){.petals{display:none}}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;text-align:center}
+.cal button{height:60px;border:0;border-radius:12px;background:rgba(255,255,255,.55);display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 0 0;font-size:15px}
+.cal button small{font-size:9px}
+.cal .dots2{display:flex;gap:2px;height:6px}.cal .dots2 i{width:5px;height:5px;border-radius:9px;display:block}
+.x{border:0;background:transparent;font-size:20px;line-height:1;color:var(--muted);min-width:44px;min-height:44px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav class="tabs" aria-label="Main tabs">
+  <a href="#today" data-tab="today">Today</a>
+  <a href="#week" data-tab="week">Week</a>
+  <a href="#garden" data-tab="garden">Garden</a>
+  <a href="#ideas" data-tab="ideas">Ideas</a>
+  <a href="#me" data-tab="me">Me</a>
+</nav>
+<div id="overlay"></div>
+<script src="config.js"></script>
+<script src="plan.js"></script>
+<script src="app.js"></script>
+<script src="vault.js"></script>
+<script src="sync.js"></script>
+</body>
+</html>
