@@ -356,8 +356,9 @@
       '<textarea class="edit" id="one" rows="2" aria-label="Today’s one thing" style="margin-top:8px;font-size:16px">' + esc(oneThing(t)) + '</textarea></div>' +
       '<div class="section"><span class="label">Steps</span>' +
       mine.map(function (k) {
-        return '<button class="row" data-task="' + k.id + '" aria-pressed="' + k.done + '">' + check(k.done) +
-          '<span class="' + (k.done ? 'done-text' : '') + '">' + esc(k.text) + (k.date < t && !k.done ? '<span class="tag">from ' + short(k.date) + '</span>' : '') + '</span></button>';
+        return '<div style="display:flex;align-items:center;border-bottom:1px solid var(--rule)"><button class="row" style="border:0;flex:1" data-task="' + k.id + '" aria-pressed="' + k.done + '">' + check(k.done) +
+          '<span class="' + (k.done ? 'done-text' : '') + '">' + esc(k.text) + (k.date < t && !k.done ? '<span class="tag">from ' + short(k.date) + '</span>' : '') + '</span></button>' +
+          '<button class="x" aria-label="Remove ' + esc(k.text) + ' from today" data-rmtask="' + k.id + '">\u00D7</button></div>';
       }).join('') +
       '<form class="add" id="addTask"><input id="taskText" placeholder="Add a step" aria-label="Add a step" autocomplete="off"><button class="pill small solid" type="submit">Add</button></form>' +
       '<label class="italic" style="display:block;margin-top:18px">Not today: <input id="boundary" class="edit italic" style="display:inline;width:auto;min-width:60%;font-size:19px" value="' + esc(f.boundary || 'the website, or any new idea.') + '"></label></div>' +
@@ -382,6 +383,17 @@
     document.getElementById('one').addEventListener('change', function (e) { setF('one', e.target.value.trim()); });
     document.getElementById('boundary').addEventListener('change', function (e) { setF('boundary', e.target.value.trim()); });
     document.getElementById('note').addEventListener('change', function (e) { state.private.notes[t] = e.target.value; save(); });
+    app.querySelectorAll('[data-rmtask]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var id = b.getAttribute('data-rmtask'), k = state.tasks.filter(function (x) { return x.id === id; })[0];
+        if (!k) return;
+        state.tasks = state.tasks.filter(function (x) { return x.id !== id; });
+        var idea = k.from && state.ideas.filter(function (x) { return x.id === k.from; })[0];
+        if (idea) idea.status = 'parked';
+        save(); vDay();
+        toast(idea ? 'Moved back to the Parking Lot' : 'Removed from today');
+      });
+    });
     app.querySelectorAll('[data-task]').forEach(function (b) {
       b.addEventListener('click', function () {
         var k = state.tasks.filter(function (x) { return x.id === b.getAttribute('data-task'); })[0];
@@ -464,12 +476,15 @@
       items.push('<div style="display:flex;justify-content:space-between;align-items:center"><span style="padding:8px 0">' + esc(x.title) + ' · ' + (x.start && x.end ? fmtT(toMin(x.start)) + ' to ' + fmtT(toMin(x.end)) : 'all day') + '</span><button class="x" aria-label="Remove ' + esc(x.title) + '" data-delev="' + x.id + '">×</button></div>');
     });
     if (!items.length) items.push('<div class="muted" style="padding:8px 0">Open day. Your Create blocks go here first.</div>');
+    var cyc = state.private.cycle, isStart = cyc.starts.indexOf(sel) >= 0;
+    if (cycOn && isStart) items.push('<button class="pill small" data-per="off" style="margin-top:6px">Remove period start</button>');
+    else if (cycOn && sel <= t) items.push('<button class="pill small solid" data-per="on" style="margin-top:6px">My period started this day</button>');
     app.innerHTML = '<div class="screen" style="background:var(--sea);min-height:100vh;padding-left:14px;padding-right:14px">' + modeToggle('month') +
       '<div style="display:flex;align-items:center;justify-content:space-between"><button class="x" aria-label="Previous month" data-mo="-1">←</button><h1 class="big serif" style="font-size:40px">' + ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][month] + '</h1><button class="x" aria-label="Next month" data-mo="1">→</button></div>' +
       '<div class="cal" style="margin-top:8px">' + ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map(function (x) { return '<span style="font-size:11px;font-weight:600;color:#4E5A6B">' + x + '</span>'; }).join('') + cells + '</div>' +
       '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;font-size:11px;color:#33404F;margin-top:10px">' + (cycOn ? '<span><span style="display:inline-block;width:10px;height:10px;border-radius:9px;background:#E8B4BE;vertical-align:-1px"></span> Period</span>' : '') + '<span><span style="display:inline-block;width:6px;height:6px;border-radius:9px;background:#70604F"></span> Work</span><span><span style="display:inline-block;width:6px;height:6px;border-radius:9px;background:#B4495F"></span> Event</span><span><span style="display:inline-block;width:6px;height:6px;border-radius:9px;background:#1F1B17"></span> Deadline</span>' + (cycOn ? '<span>CD = cycle day</span>' : '') + '</div>' +
       '<div class="note" style="margin-top:14px"><span class="label">' + esc(nice(sel)) + (ci2 ? ' · Cycle day ' + ci2.cd : '') + '</span>' +
-      (ci2 ? '<div class="serif" style="font-size:22px;margin-top:4px">' + ci2.phase + ': ' + ci2.note + '</div>' : '') + items.join('') +
+      (ci2 ? '<div class="serif" style="font-size:22px;margin-top:4px">' + ci2.phase + ': ' + ci2.note + '</div>' + (ci2.predicted ? '<div class="muted" style="font-size:12px">Estimated from your last logged period</div>' : '') : '') + items.join('') +
       '<form id="addEv" style="display:flex;flex-direction:column;gap:8px;margin-top:10px">' +
       '<label class="field">Add to this day<input id="evT" placeholder="Appointment, birthday, plans…" autocomplete="off" required></label>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><label class="field">From (optional)<input type="time" id="evS"></label><label class="field">To<input type="time" id="evE"></label></div>' +
@@ -478,6 +493,14 @@
     bindMode();
     app.querySelectorAll('[data-day]').forEach(function (b) { b.addEventListener('click', function () { selDay = b.getAttribute('data-day'); vMonth(); }); });
     app.querySelectorAll('[data-mo]').forEach(function (b) { b.addEventListener('click', function () { monthOffset += +b.getAttribute('data-mo'); selDay = null; vMonth(); }); });
+    app.querySelectorAll('[data-per]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var c = state.private.cycle;
+        if (b.getAttribute('data-per') === 'on') { if (c.starts.indexOf(sel) < 0) c.starts.push(sel); toast('Period logged for ' + short(sel)); }
+        else { c.starts = c.starts.filter(function (x) { return x !== sel; }); toast('Removed'); }
+        save(); vMonth();
+      });
+    });
     app.querySelectorAll('[data-delev]').forEach(function (b) { b.addEventListener('click', function () { var id = b.getAttribute('data-delev'); state.events = state.events.filter(function (x) { return x.id !== id; }); save(); vMonth(); }); });
     document.getElementById('addEv').addEventListener('submit', function (e) {
       e.preventDefault();
@@ -638,7 +661,7 @@
           '<p style="font-size:15px;line-height:1.5">' + (now ? 'It supports your plan. It’s on today’s steps.' : 'A good idea can wait for its week. It’s safe in the Parking Lot until Sunday.') + '</p><button class="pill solid block" id="ok">Got it</button>' +
           '<button class="pill block" id="undo" style="border:0;margin-top:6px;text-decoration:underline">' + (now ? 'Undo: keep it parked instead' : 'Actually, add it to today') + '</button>';
         var taskId = null;
-        function promote() { idea.status = 'promoted'; taskId = uid(); state.tasks.push({ id: taskId, text: idea.text, date: todayStr(), done: false }); save(); }
+        function promote() { idea.status = 'promoted'; taskId = uid(); state.tasks.push({ id: taskId, text: idea.text, date: todayStr(), done: false, from: idea.id }); save(); }
         if (now) promote();
         root.querySelector('#ok').addEventListener('click', function () { close(); vIdeas(); });
         root.querySelector('#undo').addEventListener('click', function () {
@@ -745,6 +768,7 @@
   }
   var tt;
   function toast(msg) {
+    document.querySelectorAll('.toast').forEach(function (x) { x.remove(); });
     var el = document.createElement('div'); el.className = 'toast'; el.setAttribute('role', 'status'); el.textContent = msg;
     document.body.appendChild(el); clearTimeout(tt); tt = setTimeout(function () { el.remove(); }, 2600);
   }
